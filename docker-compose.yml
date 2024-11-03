@@ -1,10 +1,15 @@
 services:
-  pytorch:
-    container_name: pytorch
-    build: . # Use the official PyTorch image with CUDA
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=all  # Use all available GPUs
+  jupyter:
+    build: .
+    image: tensorflow/tensorflow:latest-gpu-jupyter  # Custom image name
+    privileged: true  # Give the container full access to host devices
+    ports:
+      - "8888:8888"  # Maps port 8888 on the container to port 8888 on the host
     volumes:
-      - .:/app  # Mount the app directory to the container
-    working_dir: /app  # Set the working directory in the container
+      - .:/tf  # Mounts the local "notebooks" directory to /workspace in the container
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all  # Makes all GPUs visible to the container
+      - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
+      - DISPLAY=${DISPLAY}
+    runtime: nvidia  # Add this line to explicitly specify the runtime
     tty: true
